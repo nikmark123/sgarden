@@ -1,3 +1,11 @@
+import BookmarkToggle from '../components/BookmarkToggle';
+
+// Μέσα στο JSX κάθε dashboard:
+<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Typography variant="h4">Dashboard Title</Typography>
+    <BookmarkToggle dashboardId="dashboard" /> {/* αλλάζει ανάλογα με το dashboard */}
+</Box>
+
 import { useEffect, useState } from "react";
 import { Grid, Typography } from "@mui/material";
 import Dropdown from "../components/Dropdown.js";
