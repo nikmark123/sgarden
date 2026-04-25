@@ -170,7 +170,18 @@ router.post("/load-plugin", (req, res) => {
 			return res.status(400).json({ message: "Plugin name required" });
 		}
 
-		const plugin = require(pluginName);
+		const plugin = require(pluginNa// Whitelist allowed plugins
+const allowedPlugins = {
+    'weather': './plugins/weather',
+    'calendar': './plugins/calendar', 
+    'notifications': './plugins/notifications'
+};
+
+if (!allowedPlugins[pluginName]) {
+    return res.status(400).json({ message: "Invalid plugin name" });
+}
+
+const plugin = require(allowedPlugins[pluginName]);me);
 
 		return res.json({ 
 			success: true, 
