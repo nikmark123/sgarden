@@ -1,3 +1,4 @@
+import DarkModeToggle from './DarkModeToggle';
 import { useState, memo } from "react";
 import { styled } from "@mui/material/styles";
 import { AppBar, Toolbar, Typography, Menu, MenuItem, IconButton, Button, Paper, Breadcrumbs, Box } from "@mui/material";
@@ -145,6 +146,7 @@ const Header = ({ isAuthenticated }) => {
 						<Image src={logo} alt="Logo" sx={{ p: 0, my: 0, height: "100%", maxWidth: "200px" }} />
 					</Box>
 					<Box className={classes.grow} style={{ height: "100%" }} />
+					<DarkModeToggle />
 					{isAuthenticated
 					&& (
 						<>
