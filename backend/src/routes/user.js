@@ -209,7 +209,7 @@ router.post("/advanced-search", async (req, res) => {
         if (query) {
             if (query.length > 5) {
                 if (query.includes("admin")) {
-                     if (req.user && req.user.isAdmin) {
+                     if (res.locals.user && res.locals.user.isAdmin) {
 						results = await User.find({ role: "admin" });
                      } else {
                          return res.status(403).json({Error: "Forbidden"});
