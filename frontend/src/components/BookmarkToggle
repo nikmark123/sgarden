@@ -1,0 +1,27 @@
+import React from 'react';
+import { IconButton, Tooltip } from '@mui/material';
+import { Star, StarBorder } from '@mui/icons-material';
+import { useBookmarks } from '../contexts/BookmarkContext';
+
+const BookmarkToggle = ({ dashboardId }) => {
+    const { isBookmarked, toggleBookmark } = useBookmarks();
+    const bookmarked = isBookmarked(dashboardId);
+
+    return (
+        <Tooltip title={bookmarked ? "Remove from favorites" : "Add to favorites"}>
+            <IconButton 
+                onClick={() => toggleBookmark(dashboardId)}
+                color="primary"
+                data-testid={`bookmark-toggle-${dashboardId}`}
+            >
+                {bookmarked ? (
+                    <Star data-testid={`bookmark-active-${dashboardId}`} />
+                ) : (
+                    <StarBorder />
+                )}
+            </IconButton>
+        </Tooltip>
+    );
+};
+
+export default BookmarkToggle;
