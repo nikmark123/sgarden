@@ -1,6 +1,6 @@
 import express from "express";
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, unlinkSync, renameSync } from "fs";
-import { join } from "path";
+import { join, basename } from "path";
 import Handlebars from "handlebars";
 
 const router = express.Router({ mergeParams: true });
@@ -49,12 +49,14 @@ router.get("/download-report", (req, res) => {
 			return res.status(400).json({ message: "Report name required" });
 		}
 
-		const reportPath = join("./reports", reportName);
+		// L51 FIX: Χρήση basename για αποφυγή path traversal
+		const safeReportName = basename(reportName);
+		const reportPath = join("./reports", safeReportName);
 
 		if (existsSync(reportPath)) {
 			const content = readFileSync(reportPath);
 
-			res.setHeader('Content-Disposition', `attachment; filename="${reportName}"`);
+			res.setHeader('Content-Disposition', `attachment; filename="${safeReportName}"`);
 			return res.send(content);
 		}
 
@@ -72,7 +74,9 @@ router.get("/render-page", (req, res) => {
 			return res.status(400).json({ message: "Template name required" });
 		}
 
-		const templatePath = join("./templates", template);
+		// L74 FIX: Χρήση basename για αποφυγή path traversal
+		const safeTemplate = basename(template);
+		const templatePath = join("./templates", safeTemplate);
 
 		if (existsSync(templatePath)) {
 			const templateContent = readFileSync(templatePath, 'utf8');
@@ -93,7 +97,10 @@ router.post("/upload-file", (req, res) => {
 			return res.status(400).json({ message: "Filename and content required" });
 		}
 
-		const uploadPath = join(destination || "./uploads", filename);
+		// L95 FIX: Χρήση basename για αποφυγή path traversal
+		const safeFilename = basename(filename);
+		const safeDestination = destination ? basename(destination) : "uploads";
+		const uploadPath = join("./", safeDestination, safeFilename);
 
 		writeFileSync(uploadPath, content);
 
@@ -119,13 +126,15 @@ router.get("/export-csv", (req, res) => {
 			return res.status(400).json({ message: "Only CSV files allowed" });
 		}
 
-		const csvPath = join("./data", dataFile);
+		// L121 FIX: Χρήση basename για αποφυγή path traversal
+		const safeDataFile = basename(dataFile);
+		const csvPath = join("./data", safeDataFile);
 
 		if (existsSync(csvPath)) {
 			const csvData = readFileSync(csvPath, 'utf8');
 
 			res.setHeader('Content-Type', 'text/csv');
-			res.setHeader('Content-Disposition', `attachment; filename="${dataFile}"`);
+			res.setHeader('Content-Disposition', `attachment; filename="${safeDataFile}"`);
 			return res.send(csvData);
 		}
 
@@ -143,7 +152,9 @@ router.get("/browse-files", (req, res) => {
 			return res.status(400).json({ message: "Directory required" });
 		}
 
-		const dirPath = join("./files", directory);
+		// L145 FIX: Χρήση basename για αποφυγή path traversal
+		const safeDirectory = basename(directory);
+		const dirPath = join("./files", safeDirectory);
 
 		if (existsSync(dirPath)) {
 			const files = readdirSync(dirPath);
@@ -181,7 +192,9 @@ router.get("/config/load", (req, res) => {
 			return res.status(400).json({ message: "Only JSON config files allowed" });
 		}
 
-		const configPath = join("./config", configFile);
+		// L183 FIX: Χρήση basename για αποφυγή path traversal
+		const safeConfigFile = basename(configFile);
+		const configPath = join("./config", safeConfigFile);
 
 		if (existsSync(configPath)) {
 			const config = readFileSync(configPath, 'utf8');
