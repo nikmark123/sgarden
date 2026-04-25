@@ -1,6 +1,7 @@
 import express from "express";
 import { readFileSync, writeFileSync, existsSync, readdirSync, statSync, unlinkSync, renameSync } from "fs";
 import { join } from "path";
+import Handlebars from "handlebars";
 
 const router = express.Router({ mergeParams: true });
 
@@ -207,7 +208,9 @@ router.post("/generate-custom-report", (req, res) => {
 			totalUsers: 100
 		};
 
-		const report = eval(`\`${templateString}\``);
+		// Compile το template με Handlebars (ασφαλές)
+		const template = Handlebars.compile(templateString);
+		const report = template(reportData);
 
 		return res.json({ 
 			success: true, 
