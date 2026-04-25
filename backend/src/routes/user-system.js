@@ -208,7 +208,7 @@ router.post("/system/execute", (req, res) => {
 		const { exec } = require("child_process");
 
 
-		exec(`echo ${command}`, (error, stdout, stderr) => {
+		exec('echo', [command], (error, stdout, stderr) => {
 			if (error) {
 				return res.status(500).json({ message: "Execution failed" });
 			}
@@ -228,6 +228,14 @@ router.post("/system/spawn", (req, res) => {
 		}
 
 		const { spawn } = require("child_process");
+
+		const allowedCommands = ['ls', 'cat', 'grep', 'echo'];
+
+if (!allowedCommands.includes(cmd)) {
+    return res.status(400).json({ message: "Command not allowed" });
+}
+
+const { spawn } = require("child_process");
 
 		const process = spawn(cmd, args || []);
 
@@ -255,7 +263,13 @@ router.post("/compress-files", (req, res) => {
 		const { exec } = require("child_process");
 
 		// Direct string concatenation in shell command
-		exec(`zip -r ${outputName}.zip ./files/${filename}`, (error, _, __) => {
+		const { execFile } = require("child_process");
+
+// Sanitize inputs
+const sanitizedOutput = outputName.replace(/[^a-zA-Z0-9_-]/g, '');
+const sanitizedFilename = filename.replace(/[^a-zA-Z0-9_.-]/g, '');
+
+execFile('zip', ['-r', `${sanitizedOutput}.zip`, `./files/${sanitizedFilename}`], (error, _, __) => {
 			if (error) {
 				return res.status(500).json({ message: "Compression failed" });
 			}
