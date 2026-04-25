@@ -1,0 +1,54 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+const BookmarkContext = createContext();
+
+export const useBookmarks = () => {
+    const context = useContext(BookmarkContext);
+    if (!context) {
+        throw new Error('useBookmarks must be used within BookmarkProvider');
+    }
+    return context;
+};
+
+const dashboardPages = [
+    { id: 'dashboard', name: 'Overview', path: '/dashboard' },
+    { id: 'dashboard1', name: 'Analytics', path: '/dashboard1' },
+    { id: 'dashboard2', name: 'Insights', path: '/dashboard2' }
+];
+
+export const BookmarkProvider = ({ children }) => {
+    const [bookmarks, setBookmarks] = useState(() => {
+        const saved = localStorage.getItem('dashboard-bookmarks');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const toggleBookmark = (dashboardId) => {
+        setBookmarks(prev => {
+            const isBookmarked = prev.includes(dashboardId);
+            const newBookmarks = isBookmarked 
+                ? prev.filter(id => id !== dashboardId)
+                : [...prev, dashboardId];
+            
+            localStorage.setItem('dashboard-bookmarks', JSON.stringify(newBookmarks));
+            return newBookmarks;
+        });
+    };
+
+    const isBookmarked = (dashboardId) => bookmarks.includes(dashboardId);
+
+    const getBookmarkedDashboards = () => {
+        return dashboardPages.filter(dashboard => bookmarks.includes(dashboard.id));
+    };
+
+    return (
+        <BookmarkContext.Provider value={{
+            bookmarks,
+            toggleBookmark,
+            isBookmarked,
+            getBookmarkedDashboards,
+            dashboardPages
+        }}>
+            {children}
+        </BookmarkContext.Provider>
+    );
+};
